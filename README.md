@@ -36,17 +36,27 @@ To do so, they were inspired by the estimation technique for casual inference, a
 
 Causal inference is the process of determining causes and effects in a system, from data. This means we want to infer a causal structure from empirical implications. 
 
-A causal model is one where variables are caused by other variables. It is commonly used when studying the effectiveness of a treatment. In that scenario, one wants to discover if taking a certain medicine causes the illness to go away. This is why the terminology is as follows:
+A **causal model** is a mathematical model representing causal relationships within a system. In other words, variables are *caused* by other variables. It is commonly used when studying the effectiveness of a treatment. In that scenario, one wants to discover if taking a certain medicine causes the illness to go away. This is why the terminology is as follows:
 
 - **Outcome**: the state of the observed variable after taking (or not) the treatment. In our case, we could see this as whether the user has clicker or not.
-- ******************Treatment******************: the variable we think causes a certain outcome.
-- ********************Covariates********************: other variables that can affect the outcome.
+- **Treatment**: the variable we think causes a certain outcome.
+- **Covariates**: other variables that can affect the outcome.
 
-Causal inference is important because it allows us to see deeper relationships between variables than more classical statistical methods. It is well known that ************************************correlation does not imply causation.************************************ In the task at hand, we don’t know if a user has clicked an item because it is relevant to their tastes or because it is popular. We could build a model in which only relevance “causes” a click, but that would leave out a possible factor: popularity. 
+Causal inference is important because it allows us to see deeper relationships between variables than more classical statistical methods. It is well known that **correlation does not imply causation.** In the task at hand, we don’t know if a user has clicked an item because it is relevant to their tastes or because it is popular. We could build a model in which only relevance “causes” a click, but that would leave out a possible factor: popularity. 
 
-If we understand the treatment as recommending an item, we want to know if 
+To summarise, causal inference aims at finding what causes certain outcomes. In our task at hand, we can use this to be able to differenciate if the user's click was *caused* by an item being relevant.
+
+Now that we have an idea of what causal inference is, what is its relationship with the Propensity Score used by the researchers to tackle the MNAR problem?
+
+The **propensity score** is the probability of treatment assignment conditional on observed baseline characteristics. The propensity score allows one to design and analyze an observational (nonrandomized) study so that it mimics some of the particular characteristics of a randomized controlled trial. In particular, the propensity score is a balancing score: conditional on the propensity score, the distribution of observed baseline covariates will be similar between treated and untreated subjects.[^1]
+
+## Translation of the problem in terms of PS and Causal Inference
+The model...
+
 
 # Bibliography
+[^1]: 
+    [An introduction to Propensity Score Methods for Reducing the Effects of Confounding in Observational Studies ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3144483/)
 
 [https://towardsdatascience.com/implementing-causal-inference-a-key-step-towards-agi-de2cde8ea599](https://towardsdatascience.com/implementing-causal-inference-a-key-step-towards-agi-de2cde8ea599)
 
