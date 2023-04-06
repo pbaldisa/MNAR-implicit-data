@@ -71,17 +71,41 @@ In the study we are analyzing, the researchers make two assumtions for all user-
     $$\tag{1} Y_{u,i} = O_{i,i} \cdot R_{u,i} $$
     $$\tag{2}P(Y_{u,i}=1) = P(O_{i,i}=1) \cdot P(R_{u,i}=1)$$
 
-Assumption [(1)](#eq1) means that item $i$ is clicked by user $u$ if $i$ has been exposed to $i$ and $i$ is relevant.
-Assumption [(2)](#eq2) means that the click probability is decomposed into the exposure probability and relevance level. Given this assumption, the exposure probability can take different values among user-item pairs, and it can model the MNAR setting in which the click probability and relevance level are not proportional.
+Assumption [(1)](#mjx-eqn-eq1) means that item $i$ is clicked by user $u$ if $i$ has been exposed to $i$ and $i$ is relevant.
+Assumption [(2)](#mjx-eqn-eq2) means that the click probability is decomposed into the exposure probability and relevance level. Given this assumption, the exposure probability can take different values among user-item pairs, and it can model the MNAR setting in which the click probability and relevance level are not proportional.
 
-With all this notation in mind, let us formulate the problem in terms of causal inference.
+With all this notation in mind, let us formulate the problem in terms of causal inference. Keep in mind, our objective is to deal with the MNAR problem. That is, to differentiate the instances where a user clicked an item because it was relevant, from when they did so because of other variables, such as popularity.
+
+In this scenario, the **treatment** corresponds to being exposed to an item. On the other hand, the outcome is the observable data, i.e. whether the item is clicked. Recalling we defined the propensity score as the probability of receiving treatment, we have: $P(O_{u,i}=1) = P(Y_{u,i}=1 | R_{u_i}=1)$, according to our assumptions.
 
 # Proposed estimator
+## Performance metric and ideal loss function
+As stated above, the groundbreaking work of the researchers is the use of a different performance metric: relevance level instead of click probability. This metric is more suitable for our task, as it allows us to differentiate between the instances where a user clicked an item because it was relevant, and when they did so because of other variables, such as popularity. Here is the definition of the metric:
+$$
+\mathcal{R}_{relevance}(\mathcal{\hat{Z}}) = \frac{1}{m} \sum_{u=1}^{m} \sum_{i=1}^{n} P(R_{u,i}=1) \cdot c(\mathcal{\hat{Z}}_{u,i})
+$$
+
+Where $\mathcal{\hat{Z}}$ is the predicted ranking of item $i$ for user $u$ and the function $c(\mathcal{\hat{Z}}_{u,i})$ characterizes a top-N scoring metric[^2]. In this case, the researchers used the DCG@K metric, which is defined as follows: $c(\mathcal{\hat{Z}}_{u,i}) = \mathbb{1}{(\mathcal{\hat{Z}}_{u,i} \leq K)} / \log(\mathcal{\hat{Z}}_{u,i}+1)$. Note that $P(R_{u,i}=1)$ is the relevance level of the user-item pair.
+
+Basically, this metric is the average relevance level of the user-item pairs weighted by the top-N scoring metric. The goal now is to find a loss function that maximizes this metric. To achieve this, the researchers used the basic pointwise approach. This means that they used a local loss function for each user-item pair, and then averaged the loss across all user-item pairs. If $\mathcal{D}$ is the set of all user-item pairs, the loss function is defined as follows:
+$$
+\mathcal{L}(\mathcal{\hat{R}}) = \frac{1}{\|\mathcal{D}\|}\sum_{(u,i) \in \mathcal{D}} [P(R_{u,i}=1) \cdot \delta^{(1)}(\mathcal{\hat{R}}_{u,i}) + (1-P(R_{u,i}=1)) \cdot \delta^{(0)}(\mathcal{\hat{R}}_{u,i})]
+$$
+
+Where $\mathcal{\hat{R}}$ is the predicted relevance level of the user-item pair (which is unobserved), and $\delta^{(1)}$ and $\delta^{(0)}$ are the loss functions for the positive and negative cases, respectively. One could use, for example, a log loss function as $\delta^{(R)}, R \in \{0,1\}$.
+
+Note that a prediction matrix $\mathcal{\hat{R}}$ minimizing the ideal loss function $\mathcal{L}$ is expected to lead to the desired values of the top-N recommendation metric in $\mathcal{R}_{relevance}$. 
+
+//Estimator
+
 
 
 # Bibliography
 [^1]: 
     [An introduction to Propensity Score Methods for Reducing the Effects of Confounding in Observational Studies ](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3144483/)
+
+[^2]:
+    **Top-N scoring metrics** are a family of metrics that measure the performance of a ranking algorithm. They measure how often your predicted class falls in the top N values of your distribution. [Evaluating models using the Top N accuracy metrics](https://medium.com/nanonets/evaluating-models-using-the-top-n-accuracy-metrics-c0355b36f91b)
 
 [https://towardsdatascience.com/implementing-causal-inference-a-key-step-towards-agi-de2cde8ea599](https://towardsdatascience.com/implementing-causal-inference-a-key-step-towards-agi-de2cde8ea599)
 
