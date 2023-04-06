@@ -50,8 +50,33 @@ Now that we have an idea of what causal inference is, what is its relationship w
 
 The **propensity score** is the probability of treatment assignment conditional on observed baseline characteristics. The propensity score allows one to design and analyze an observational (nonrandomized) study so that it mimics some of the particular characteristics of a randomized controlled trial. In particular, the propensity score is a balancing score: conditional on the propensity score, the distribution of observed baseline covariates will be similar between treated and untreated subjects.[^1]
 
-## Translation of the problem in terms of PS and Causal Inference
-The model...
+What this means is that propensity scores are a way to control the covariates by balancing the treated and untreated groups in terms of this score.
+
+The data we have available, is observational data. Thus, it does not control sub-population sizes (i.e. treated and untreated groups may have widely different sizes). Furthermore, the groups may have systematic differences. This is what we want to "control" with the propensity score.
+
+In a randomized controlled trial, the propensity score (probability of treatment) is known and defined by the study. In observational data, however, the true propensity score is generally unknown, but it can be estimated.
+
+# Problem formulation and translation into causal inference terms
+Let us introduce some notation. From now on, $u$ refers to a user, and $i$ to an item. Also, let $m$ be the number of users in our dataset, and $n$ the number of items.
+
+Let $Y \in \{0,1\}^{m \times n}$ be a click matrix where each entry $Y_{u, i}$ is a **Bernoulli random variable** representing a click between user $u$ and item $i$. In implicit feedback recommendation, $Y_{u,i} = 1$ indicates positive feedback (i.e. click) and $Y_{u,i} = 0$ is either negative or unlabeled positive feedback (i.e. no click).
+
+In a similar manner, $R \in \{0,1\}^{m \times n}$ is a relevance matrix, where each entry is also a Bernoulli random variable representing the relevance of the user-item pair. If $R_{u,i} = 1$, user $u$ and item $i$ are relevant, otherwise they are irrelevant.
+
+Finally, $O \in \{0,1\}^{m \times n}$ is the exposure matrix. In this case, each entry is a random variable representing whether user $u$ has been exposed to item $i$.
+
+Note that in our case, both relevance and exposure random variables are unobserved. We only possess data on whether a user has or has not clicked an item.
+
+In the study we are analyzing, the researchers make two assumtions for all user-item pairs:
+    $$\tag{1} Y_{u,i} = O_{i,i} \cdot R_{u,i} $$
+    $$\tag{2}P(Y_{u,i}=1) = P(O_{i,i}=1) \cdot P(R_{u,i}=1)$$
+
+Assumption [(1)](#eq1) means that item $i$ is clicked by user $u$ if $i$ has been exposed to $i$ and $i$ is relevant.
+Assumption [(2)](#eq2) means that the click probability is decomposed into the exposure probability and relevance level. Given this assumption, the exposure probability can take different values among user-item pairs, and it can model the MNAR setting in which the click probability and relevance level are not proportional.
+
+With all this notation in mind, let us formulate the problem in terms of causal inference.
+
+# Proposed estimator
 
 
 # Bibliography
