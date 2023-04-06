@@ -81,16 +81,12 @@ In this scenario, the **treatment** corresponds to being exposed to an item. On 
 # Proposed estimator
 ## Performance metric and ideal loss function
 As stated above, the groundbreaking work of the researchers is the use of a different performance metric: relevance level instead of click probability. This metric is more suitable for our task, as it allows us to differentiate between the instances where a user clicked an item because it was relevant, and when they did so because of other variables, such as popularity. Here is the definition of the metric:
-$$
-\mathcal{R}_{relevance}(\mathcal{\hat{Z}}) = \frac{1}{m} \sum_{u=1}^{m} \sum_{i=1}^{n} P(R_{u,i}=1) \cdot c(\mathcal{\hat{Z}}_{u,i})
-$$
+    $$\mathcal{R}_{relevance}(\mathcal{\hat{Z}}) = \frac{1}{m} \sum_{u=1}^{m} \sum_{i=1}^{n} P(R_{u,i}=1) \cdot c(\mathcal{\hat{Z}}_{u,i})$$
 
 Where $\mathcal{\hat{Z}}$ is the predicted ranking of item $i$ for user $u$ and the function $c(\mathcal{\hat{Z}}_{u,i})$ characterizes a top-N scoring metric[^2]. In this case, the researchers used the DCG@K metric, which is defined as follows: $c(\mathcal{\hat{Z}}_{u,i}) = \mathbb{1}{(\mathcal{\hat{Z}}_{u,i} \leq K)} / \log(\mathcal{\hat{Z}}_{u,i}+1)$. Note that $P(R_{u,i}=1)$ is the relevance level of the user-item pair.
 
 Basically, this metric is the average relevance level of the user-item pairs weighted by the top-N scoring metric. The goal now is to find a loss function that maximizes this metric. To achieve this, the researchers used the basic pointwise approach. This means that they used a local loss function for each user-item pair, and then averaged the loss across all user-item pairs. If $\mathcal{D}$ is the set of all user-item pairs, the loss function is defined as follows:
-$$
-\mathcal{L}(\mathcal{\hat{R}}) = \frac{1}{\|\mathcal{D}\|}\sum_{(u,i) \in \mathcal{D}} [P(R_{u,i}=1) \cdot \delta^{(1)}(\mathcal{\hat{R}}_{u,i}) + (1-P(R_{u,i}=1)) \cdot \delta^{(0)}(\mathcal{\hat{R}}_{u,i})]
-$$
+    $$\mathcal{L}(\mathcal{\hat{R}}) = \frac{1}{\|\mathcal{D}\|}\sum_{(u,i) \in \mathcal{D}} [P(R_{u,i}=1) \cdot \delta^{(1)}(\mathcal{\hat{R}}_{u,i}) + (1-P(R_{u,i}=1)) \cdot \delta^{(0)}(\mathcal{\hat{R}}_{u,i})]$$
 
 Where $\mathcal{\hat{R}}$ is the predicted relevance level of the user-item pair (which is unobserved), and $\delta^{(1)}$ and $\delta^{(0)}$ are the loss functions for the positive and negative cases, respectively. One could use, for example, a log loss function as $\delta^{(R)}, R \in \{0,1\}$.
 
