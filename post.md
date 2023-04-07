@@ -1,5 +1,5 @@
 # Unbiased Recommender Learning from Missing-Not-At-Random Implicit Feedback
-Understanding the article of the same name by Yuta Saito, Suguru Yaginuma, Yuta Nishino, Hayato Sakata and Kazuhide Nakata. The full article can be foudn [here](https://arxiv.org/pdf/1909.03601.pdf).
+Understanding the article of the same name by Yuta Saito, Suguru Yaginuma, Yuta Nishino, Hayato Sakata and Kazuhide Nakata. The full article can be found [here](https://arxiv.org/pdf/1909.03601.pdf).
 
 The article by Yuta Saito et. al. analyses two existing methods for implicit feedback recommendation, showing their shortcomings. Then, it introduces a new method based on the use of a different loss function and a new estimator. One of the most relevant accomplishments of this study is to change the paradigm of what one optimises. Instead of predicting items with the highest click probability, one should predict the items with the highest relevance.
 
