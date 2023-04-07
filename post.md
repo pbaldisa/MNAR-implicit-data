@@ -113,6 +113,11 @@ With all this, we can conclude that $\mathbb{E}[\mathcal{\hat{L}}_{unbiased}(\ma
 # Experiments
 I have added a Jupyter Notebook where we can test the proposed method with real data. I have also added experimental results that show the proposed method suffers from high variance. This is addressed in the second part of the paper, which is not covered in this post.
 
+In he experiments, there is a need to estimate the propensity score. The authors used the following relative item popularity:
+$$
+\hat{\theta}_{*,u}=(\frac{\sum_{u\in\mathcal{U}Y_{u,i}}}{\max_{i\in\mathcal{I}}\sum_{u\in\mathcal{U}}{Y_{u,i}}})^{\eta}
+$$
+
 
 # Bibliography
 [^1]: 
