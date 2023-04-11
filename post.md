@@ -81,16 +81,20 @@ In this scenario, the **treatment** corresponds to being exposed to an item. On 
 # Proposed estimator
 ## Performance metric and ideal loss function
 As stated above, the groundbreaking work of the researchers is the use of a different performance metric: relevance level instead of click probability. This metric is more suitable for our task, as it allows us to differentiate between the instances where a user clicked an item because it was relevant, and when they did so because of other variables, such as popularity. Here is the definition of the metric:
-$$
+```math
 \mathcal{R}_{relevance}(\mathcal{\hat{Z}}) = \frac{1}{m} \sum_{u=1}^{m} \sum_{i=1}^{n} P(R_{u,i}=1) \cdot c(\mathcal{\hat{Z}}_{u,i})
-$$
+```
 
-Where $\mathcal{\hat{Z}}$ is the predicted ranking of item $i$ for user $u$ and the function $c(\mathcal{\hat{Z}}_{u,i})$ characterizes a top-N scoring metric[^2]. In this case, the researchers used the DCG@K metric, which is defined as follows: $c(\mathcal{\hat{Z}}_{u,i}) = \mathbb{1}{(\mathcal{\hat{Z}}_{u,i} \leq K)} / \log(\mathcal{\hat{Z}}_{u,i}+1)$. Note that $P(R_{u,i}=1)$ is the relevance level of the user-item pair.
+Where $\mathcal{\hat{Z}}$ is the predicted ranking of item $i$ for user $u$ and the function $c(\mathcal{\hat{Z}}_{u,i})$ characterizes a top-N scoring metric[^2]. In this case, the researchers used the DCG@K metric, which is defined as follows: 
+```math
+c(\mathcal{\hat{Z}}_{u,i}) = \mathbb{1}{(\mathcal{\hat{Z}}_{u,i} \leq K)} / \log(\mathcal{\hat{Z}}_{u,i}+1)
+```
+Note that $P(R_{u,i}=1)$ is the relevance level of the user-item pair.
 
 Basically, this metric is the average relevance level of the user-item pairs weighted by the top-N scoring metric. The goal now is to find a loss function that maximizes this metric. To achieve this, the researchers used the basic pointwise approach. This means that they used a local loss function for each user-item pair, and then averaged the loss across all user-item pairs. If $\mathcal{D}$ is the set of all user-item pairs, the loss function is defined as follows:
-$$
+```math
 \mathcal{L}(\mathcal{\hat{R}}) = \frac{1}{\|\mathcal{D}\|}\sum_{(u,i) \in \mathcal{D}} [P(R_{u,i}=1) \cdot \delta^{(1)}(\mathcal{\hat{R}}_{u,i}) + (1-P(R_{u,i}=1)) \cdot \delta^{(0)}(\mathcal{\hat{R}}_{u,i})]
-$$
+```
 
 Where $\mathcal{\hat{R}}$ is the predicted relevance level of the user-item pair (which is unobserved), and $\delta^{(1)}$ and $\delta^{(0)}$ are the loss functions for the positive and negative cases, respectively. One could use, for example, a log loss function as $\delta^{(R)}, R \in \{0,1\}$.
 
@@ -98,25 +102,28 @@ Note that a prediction matrix $\mathcal{\hat{R}}$ minimizing the ideal loss func
 
 ## Unbiased estimator for loss function
 The researchers use the following unbiased estimator for the ideal loss function:
-$$\mathcal{\hat{L}}_{unbiased}(\mathcal{\hat{R}}) = \frac{1}{\|\mathcal{D}\|}\sum_{(u,i)\in\mathcal{D}}[\frac{Y_{u,i}}{P(O_{u,i}=1)}\delta^{(1)}_{u,i}(\mathcal{\hat{R}}_{u,i})+(1-\frac{Y_{u,i}}{P(O_{u,i}=1)})\delta^{(0)}_{u,i}(\mathcal{\hat{R}}_{u,i})]$$
+```math
+\mathcal{\hat{L}}_{unbiased}(\mathcal{\hat{R}}) := \mathcal{\hat{L}}_u(\mathcal{\hat{R}}) = \frac{1}{\|\mathcal{D}\|}\sum_{(u,i)\in\mathcal{D}}(\frac{Y_{u,i}}{P(O_{u,i}=1)}\delta^{(1)}_{u,i}(\mathcal{\hat{R}}_{u,i})+(1-\frac{Y_{u,i}}{P(O_{u,i}=1)})\delta^{(0)}_{u,i}(\mathcal{\hat{R}}_{u,i}))
+```
 
 Note that this estimator for the loss function only uses the observed data, i.e. $Y_{u,i}$ (which is click data) and $P(O_{u,i}=1)$ (which is the propensity score). The first term of the sum is the loss function for the positive case, and the second term is the loss function for the negative case. The first term is multiplied by the ratio of the observed click probability and the propensity score, and the second term is multiplied by the ratio of the observed non-click probability and the propensity score. This is because the propensity score is the probability of receiving treatment, and the observed click probability is the probability of receiving treatment given that the user clicked the item. Therefore, the ratio of the observed click probability and the propensity score is the probability of receiving treatment given that the user clicked the item, and the ratio of the observed non-click probability and the propensity score is the probability of receiving treatment given that the user did not click the item.
 
 When comparing to the ideal loss function, the only change is the substitution of $P(R_{u,i}=1)$ for the ratio of the observed click probability and the propensity score. This is because the ideal loss function is defined in terms of the unobserved relevance level. This works because:
-$$
+```math
 \mathbb{E}[\frac{Y_{u,i}}{P(O_{u,i}=1)}] = \frac{\mathbb{E}[Y_{u,i}]}{P(O_{u,i}=1)}=\frac{P(Y_{u,i}=1)\cdot1+P(Y_{u,i}=0)\cdot0}{P(O_{u,i}=1)}=\frac{P(Y_{u,i}=1)}{P(O_{u,i}=1)}=P(R_{u,i}=1)
-$$
+```
+
 Where we used the fact that $Y_{u,i}$ is a Bernoulli random variable with parameter $P(R_{u,i}=1)$ and assumption (2) that $P(Y_{u,i}=1)=P(O_{u,i}=1)P(R_{u,i}=1)$. 
 
-With all this, we can conclude that $\mathbb{E}[\mathcal{\hat{L}}_{unbiased}(\mathcal{\hat{R}})] = \mathbb{E}[\mathcal{L}(\mathcal{\hat{R}})]$, which means that $\mathcal{\hat{L}}_{unbiased}$ is an unbiased estimator for the ideal loss function.
+With all this, we can conclude that $\mathbb{E}[\mathcal{\hat{L}}_u(\mathcal{\hat{R}})] = \mathbb{E}[\mathcal{L}(\mathcal{\hat{R}})]$, which means that $\mathcal{\hat{L}}_u$ is an unbiased estimator for the ideal loss function.
 
 # Experiments
 I have added a Jupyter Notebook where we can test the proposed method with real data. I have also added experimental results that show the proposed method suffers from high variance. This is addressed in the second part of the paper, which is not covered in this post.
 
 In he experiments, there is a need to estimate the propensity score. The authors used the following relative item popularity:
-$$
+```math
 \hat{\theta}_{*,u}=(\frac{\sum_{u\in\mathcal{U}Y_{u,i}}}{\max_{i\in\mathcal{I}}\sum_{u\in\mathcal{U}}{Y_{u,i}}})^{\eta}
-$$
+```
 
 
 # Bibliography
